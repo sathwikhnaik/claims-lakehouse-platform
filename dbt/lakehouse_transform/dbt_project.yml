@@ -1,0 +1,12 @@
+name: 'lakehouse_transform'
+version: '1.0.0'
+profile: 'lakehouse_transform'
+
+model-paths: ["models"]
+
+models:
+  lakehouse_transform:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

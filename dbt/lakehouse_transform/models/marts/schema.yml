@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: dim_providers
+    description: "One row per provider, with lifetime claim aggregates."
+    columns:
+      - name: provider_id
+        tests: [unique, not_null]
+      - name: total_billed
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: fct_provider_daily_billing
+    description: "Daily billing rollup per provider, with spike flag for fraud signal work."
+    columns:
+      - name: provider_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_providers')
+              field: provider_id
+      - name: claim_date
+        tests: [not_null]
+      - name: is_billing_spike
+        tests:
+          - accepted_values:
+              values: [true, false]

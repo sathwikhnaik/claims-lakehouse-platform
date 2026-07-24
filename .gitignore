@@ -1,0 +1,32 @@
+# Cursor MCP config (contains Databricks token / secrets)
+.cursor/mcp.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Environment files
+.env
+
+# Spark / Delta local artifacts
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Terraform state / secrets / local cache
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# dbt build artifacts / installed packages
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# Misc local logs
+databricks_mcp.log

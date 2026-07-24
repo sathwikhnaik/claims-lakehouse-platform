@@ -1,0 +1,11 @@
+lakehouse_transform:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: claims_platform          # <- your Unity Catalog name, not hive_metastore
+      schema: silver
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 4

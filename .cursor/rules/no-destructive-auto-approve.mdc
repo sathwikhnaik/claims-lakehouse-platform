@@ -1,0 +1,52 @@
+---
+description: Block destructive actions from running unattended in auto-approve/YOLO mode
+alwaysApply: true
+---
+
+# No Destructive Actions Without Explicit Permission
+
+Even when auto-approve (YOLO) mode is enabled, you must NEVER run a destructive
+or irreversible action without first stopping and getting explicit, in-the-moment
+confirmation from the user for that specific action. Treat auto-approve as
+covering routine, reversible work only — it is not blanket permission for the
+actions below.
+
+## Always stop and ask first for
+
+- **Deleting data or files**: `rm -rf`, `Remove-Item -Recurse -Force`, deleting
+  files/directories outside of files you just created, deleting anything under
+  `sample_data/`, warehouse/Delta table directories, or Spark checkpoint dirs.
+- **Dropping/truncating data**: `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`,
+  `DELETE FROM ... ` without a `WHERE`, Delta `VACUUM`, overwriting a Bronze/
+  Silver/Gold table or dataset with `mode("overwrite")` against real (non-scratch)
+  paths.
+- **Docker/infra teardown**: `docker-compose down -v`, `docker system prune`,
+  `docker volume rm`, deleting containers/volumes that hold persisted data.
+- **Git history rewrites**: `git push --force`/`--force-with-lease`,
+  `git reset --hard`, `git clean -fdx`, `git rebase` on shared branches,
+  deleting or force-pushing over remote branches.
+- **Credentials/config**: modifying or deleting `.env` files, secrets,
+  `docker-compose.yml` service definitions that affect persisted volumes, or
+  `.cursor/mcp.json`.
+- **Cloud/infra destroy**: `terraform destroy`, deleting cloud resources
+  (buckets, warehouses, clusters), or any command with `destroy`, `purge`, or
+  `--force` flags on infrastructure.
+- **Bulk/irreversible schema or data migrations** that cannot be trivially
+  rolled back.
+
+## How to handle it
+
+1. Do not execute the command/tool call. Explain what the action would do and
+   why it's destructive/irreversible.
+2. Ask the user to explicitly confirm that exact action (use `AskQuestion` when
+   presenting alternatives, or clearly state what confirmation you need).
+3. Only proceed after receiving explicit approval for that specific action in
+   the current turn — a prior general "auto-approve everything" setting does
+   not count as that approval.
+
+## Not affected by this rule
+
+Reversible, low-risk actions remain fine to auto-approve normally: creating or
+editing files, running tests, reading data, `git add`/`git commit` (without
+`--amend` on pushed commits), starting/stopping (not removing) containers,
+non-destructive dbt/Spark runs against scratch/dev data.
