@@ -1,4 +1,4 @@
 # airflow/Dockerfile
 FROM apache/airflow:2.9.3
 USER airflow
-RUN pip install --no-cache-dir dbt-databricks==1.9.1
+RUN pip install --no-cache-dir dbt-databricks==1.9.1 snowflake-connector-python databricks-sdk

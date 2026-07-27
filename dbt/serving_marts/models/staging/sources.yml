@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: serving_raw
+    schema: SERVING
+    tables:
+      - name: fct_provider_daily_billing
+        description: >
+          Raw CSV load of the Databricks gold export (fct_provider_daily_billing),
+          landed by the full_pipeline Airflow DAG's load_to_snowflake task.
+        config:
+          loaded_at_field: claim_date
+          freshness:
+            warn_after: {count: 48, period: hour}
+            error_after: {count: 96, period: hour}

@@ -21,7 +21,12 @@ services:
       DATABRICKS_HOST: "${DATABRICKS_HOST}"
       DATABRICKS_HTTP_PATH: "${DATABRICKS_HTTP_PATH}"
       DATABRICKS_TOKEN: "${DATABRICKS_TOKEN}"
-    command: bash -c "airflow db migrate && airflow users create --username admin --password admin --firstname a --lastname b --role Admin --email admin@example.com"
+      GOLD_EXPORT_JOB_ID: "${GOLD_EXPORT_JOB_ID}"
+      SNOWFLAKE_ACCOUNT: "${SNOWFLAKE_ACCOUNT}"
+      SNOWFLAKE_USER: "${SNOWFLAKE_USER}"
+      SNOWFLAKE_PRIVATE_KEY_PATH: "/opt/airflow/keys/snowflake_key.p8"
+    command: >
+      bash -c "airflow db migrate && airflow users create --username admin --password admin --firstname a --lastname b --role Admin --email admin@example.com"
 
   airflow-webserver:
     build:
@@ -32,7 +37,11 @@ services:
     ports: ["8080:8080"]
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-      - ./lakehouse_transform:/opt/airflow/lakehouse_transform
+      - ./dbt/lakehouse_transform:/opt/airflow/lakehouse_transform
+      - ./dbt/serving_marts:/opt/airflow/serving_marts
+      - ./exports:/opt/airflow/exports
+      - ./dashboard:/opt/airflow/dashboard
+      - ~/.snowflake/snowflake_key.p8:/opt/airflow/keys/snowflake_key.p8:ro
     command: airflow webserver
 
   airflow-scheduler:
@@ -43,7 +52,11 @@ services:
     environment: *airflow-env
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-      - ./lakehouse_transform:/opt/airflow/lakehouse_transform
+      - ./dbt/lakehouse_transform:/opt/airflow/lakehouse_transform
+      - ./dbt/serving_marts:/opt/airflow/serving_marts
+      - ./exports:/opt/airflow/exports
+      - ./dashboard:/opt/airflow/dashboard
+      - ~/.snowflake/snowflake_key.p8:/opt/airflow/keys/snowflake_key.p8:ro
     command: airflow scheduler
 
   redpanda:

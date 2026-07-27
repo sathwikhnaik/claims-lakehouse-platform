@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: mart_fraud_signals
+    description: "Daily provider billing signals with a spike_ratio for fraud detection, consumed by the dashboard."
+    columns:
+      - name: provider_id
+        tests: [not_null]
+      - name: claim_date
+        tests: [not_null]
+      - name: is_billing_spike
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+      - name: spike_ratio
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: true
+              config:
+                where: "spike_ratio is not null"

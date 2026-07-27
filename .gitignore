@@ -13,6 +13,11 @@ __pycache__/
 spark-warehouse/
 metastore_db/
 derby.log
+checkpoints/
+delta/
+
+# Local data exports / scratch CSVs (regenerable, not source of truth)
+terraform/snowflake/*.csv
 
 # Terraform state / secrets / local cache
 *.tfvars
